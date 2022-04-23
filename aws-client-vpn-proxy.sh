@@ -258,10 +258,23 @@ remote 127.0.0.1 33443' $target_path
 }
 
 function find_proxy_port() {
+    if [ ! -z ${SOCKS5_PORT:-} ]; then 
+        echo ${SOCKS5_PORT}
+        return 0
+    fi
+    set +e
     ss_pid=$(ps aux | grep -i 'ss-local' | grep -v grep | awk '{print $2}')
     if [ -z $ss_pid ]; then
-        clr_red "ERROR: Cannot find your shadwoscoks proxy(socks5 port), please check if your shadwoscoks started. Exit."
+        >&2 echo
+        >&2 clr_bold clr_red "ERROR: Cannot find your shadwoscoks proxy socks5 port automatically, please check if your shadwoscoks started. "
+        >&2 echo
+        >&2 clr_bold clr_brown "If you are using your own FanQiang proxy, please set environment variable SOCKS5_PORT to indicate your socks5 port:" 
+        >&2 echo
+        >&2 clr_bold clr_green "export SOCKS5_PORT=1087 #socks5 port of your proxy"
+        >&2 echo
+        return 1
     fi
+    set -e
     socks5_port=$(netstat -anv -p tcp | grep $ss_pid | awk '{print $4}' | grep 127.0.0.1 | awk -F. '{print $NF}' | head -1)
     echo $socks5_port
 }
