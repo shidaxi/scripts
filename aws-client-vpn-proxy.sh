@@ -172,6 +172,10 @@ function find_ovpn_config_path() {
 }
 
 function setup_client_vpn() {
+    if grep ${PROFILE_NAME} $HOME/.config/AWSVPNClient/ConnectionProfiles > /dev/null; then
+        echo; clr_bold clr_brown "Profile ${PROFILE_NAME} configured, skip. Want to re-configure it? Delete this profile from AWS Client VPN."
+        return 0
+    fi
 
     ## Prepare the .ovpn config
     file=$(find_ovpn_config_path)
@@ -281,6 +285,7 @@ function setup_goproxy() {
 }
 
 function start_goproxy() {
+    setup_goproxy
     proxy_port=$(find_proxy_port)
     ovpn_path=$(find_ovpn_config_path)
     cvpn_endpoint=$(grep cvpn-endpoint ${ovpn_path} | awk '{print $2}')
@@ -301,9 +306,10 @@ function help() {
     clr_green "  $0 start"
 }
 
-if ! grep ${PROFILE_NAME} $HOME/.config/AWSVPNClient/ConnectionProfiles > /dev/null; then
-    setup_client_vpn
-    setup_goproxy
-fi
+socks5_port=$(find_proxy_port)
+export http_proxy=http://127.0.0.1:1080 
+export https_proxy=http://127.0.0.1:1080
+export no_proxy=10.0.0.0/8,127.0.0.0/8,localhost
 
+setup_client_vpn
 start_goproxy
