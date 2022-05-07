@@ -320,9 +320,6 @@ function help() {
 }
 
 socks5_port=$(find_proxy_port)
-export http_proxy=http://127.0.0.1:1080 
-export https_proxy=http://127.0.0.1:1080
-export no_proxy=10.0.0.0/8,127.0.0.0/8,localhost
 
 setup_client_vpn
 start_goproxy
