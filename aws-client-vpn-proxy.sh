@@ -321,5 +321,7 @@ function help() {
 
 socks5_port=$(find_proxy_port)
 
+export all_proxy=socks5://127.0.0.1:${socks5_port}
+
 setup_client_vpn
 start_goproxy
