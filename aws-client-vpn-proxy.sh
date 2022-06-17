@@ -228,7 +228,7 @@ remote 127.0.0.1 33443' $target_path
         #         "CompatibilityVersion": "2",
         #         "FederatedAuthType": 1
         #     }]' ${connection_profiles_path}) > ${connection_profiles_path}
-        jq '.ConnectionProfiles += [{
+        $JQ_BIN '.ConnectionProfiles += [{
                 "ProfileName": "'${PROFILE_NAME}'",
                 "OvpnConfigFilePath": "'${target_path}'",
                 "CvpnEndpointId": "'${cvpn_endpoint_id}'",
