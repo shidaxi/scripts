@@ -138,6 +138,9 @@ fi
 
 GO_PROXY_BIN=proxy-for-aws-client-vpn
 PROFILE_NAME=aws-vpn
+BIN_DIR=$HOME/.bin
+
+mkdir -p $BIN_DIR
 
 # find .ovpn path
 function download_url() {
@@ -200,13 +203,13 @@ remote 127.0.0.1 33443' $target_path
     ## Prepare the connectionProfiles config
     JQ_BIN=jq
     if ! command -v $JQ_BIN > /dev/null; then
-        JQ_BIN=/tmp/jq
+        JQ_BIN=$BIN_DIR/jq
         if ! command -v $JQ_BIN > /dev/null; then
         clr_blue "jq command not found, download to ${JQ_BIN} for temporary usage"
         download_url \
             https://github.com/stedolan/jq/releases/download/jq-1.6/jq-osx-amd64 \
             /tmp/
-        mv /tmp/jq-osx-amd64 /tmp/jq && chmod +x /tmp/jq
+        mv /tmp/jq-osx-amd64 $JQ_BIN && chmod +x $JQ_BIN
         fi
     fi
     connection_profiles_path=$HOME/.config/AWSVPNClient/ConnectionProfiles
@@ -280,11 +283,11 @@ function find_proxy_port() {
 }
 
 function setup_goproxy() {
-    if [ -e /usr/local/bin/${GO_PROXY_BIN} ]; then
+    if [ -e ${BIN_DIR}/${GO_PROXY_BIN} ]; then
         clr_blue "Detected goproxy installed. Skip."
         return 0
     fi
-    clr_blue "Start install goproxy to /usr/local/bin/${GO_PROXY_BIN} ..."
+    clr_blue "Start install goproxy to ${BIN_DIR}/${GO_PROXY_BIN} ..."
     # download goproxy
     download_url \
         https://github.com/snail007/goproxy/releases/download/v11.7/proxy-darwin-amd64.tar.gz \
@@ -292,8 +295,8 @@ function setup_goproxy() {
     mkdir -p /tmp/goproxy
     tar xzf /tmp/proxy-darwin-amd64.tar.gz -C /tmp/goproxy 
     chmod +x /tmp/goproxy/proxy
-    mv /tmp/goproxy/proxy /usr/local/bin/${GO_PROXY_BIN}
-    clr_blue "/usr/local/bin/${GO_PROXY_BIN} installed."
+    mv /tmp/goproxy/proxy ${BIN_DIR}/${GO_PROXY_BIN}
+    clr_blue "${BIN_DIR}/${GO_PROXY_BIN} installed."
     rm -rf /tmp/proxy*
 }
 
@@ -309,7 +312,7 @@ function start_goproxy() {
     clr_bold clr_blue "Found socks5 proxy listening on port ${proxy_port}. Starting goproxy..."; echo
     clr_bold clr_brown "DONOT close the terminal window and keep it OPENING."; echo
     clr_bold clr_brown "Now open your AWS Client VPN, select profile ${PROFILE_NAME} and click Connect button."
-    cmd="/usr/local/bin/${GO_PROXY_BIN} tcp -p :33443 -T tcp -P a.${cvpn_endpoint}:443 -J socks5://127.0.0.1:${proxy_port}"
+    cmd="${BIN_DIR}/${GO_PROXY_BIN} tcp -p :33443 -T tcp -P a.${cvpn_endpoint}:443 -J socks5://127.0.0.1:${proxy_port}"
     echo; clr_bold clr_green ">>> $cmd"; $cmd
 }
 
