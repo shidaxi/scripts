@@ -290,7 +290,7 @@ function setup_goproxy() {
     clr_blue "Start install goproxy to ${BIN_DIR}/${GO_PROXY_BIN} ..."
     # download goproxy
     download_url \
-        https://github.com/snail007/goproxy/releases/download/v11.7/proxy-darwin-amd64.tar.gz \
+        https://github.com/snail007/goproxy/releases/download/v11.9/proxy-darwin-amd64.tar.gz \
         /tmp/
     mkdir -p /tmp/goproxy
     tar xzf /tmp/proxy-darwin-amd64.tar.gz -C /tmp/goproxy 
