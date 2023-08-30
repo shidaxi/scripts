@@ -44,10 +44,10 @@ case $svc in
       describe-instances )
         aws ec2 describe-instances --instance-ids "${id}"
         ;;
-      start-instance )
+      start-instances )
         aws ec2 start-instances --instance-ids "${id}"
         ;;
-      stop-instance )
+      stop-instances )
         aws ec2 stop-instances --instance-ids "${id}"
         ;;
     esac
