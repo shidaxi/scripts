@@ -36,13 +36,19 @@ svc=$(echo ec2 sso s3 acm cloudfront | tr ' ' '\n' | gum filter)
 case $svc in
   ec2 )
     id=$(select_ec2)
-    action=$(echo ssm-start-session describe-instance | tr ' ' '\n' | gum filter)
+    action=$(echo ssm-start-session describe-instances start-instances stop-instances | tr ' ' '\n' | gum filter)
     case $action in
       ssm-start-session )
         aws ssm start-session --target "${id}"
         ;;
-      describe-instance )
+      describe-instances )
         aws ec2 describe-instances --instance-ids "${id}"
+        ;;
+      start-instance )
+        aws ec2 start-instances --instance-ids "${id}"
+        ;;
+      stop-instance )
+        aws ec2 stop-instances --instance-ids "${id}"
         ;;
     esac
     ;;
