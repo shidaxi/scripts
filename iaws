@@ -1,0 +1,55 @@
+#!/bin/bash
+
+function check_cmd() {
+    cmds=$@
+    for cmd in $cmds; do 
+    command -v $cmd > /dev/null
+    if [ "$?" != "0" ]; then 
+        printf "${C_RED}${C_BOLD}ERROR: $cmd is not installed or in PATH. \n${C_RESET}"
+        exit 1
+    fi
+    done
+}
+check_cmd gum aws session-manager-plugin
+
+AWS_PROFILE=$(aws configure list-profiles | gum filter)
+export AWS_PROFILE
+
+function select_ec2() {
+    r=$(aws ec2 describe-instances \
+        --filters Name=tag-key,Values=Name \
+        --query "Reservations[*].Instances[*].{
+          Name:Tags[?Key==\`Name\`]|[0].Value,
+          AZ:Placement.AvailabilityZone,
+          IP:PrivateIpAddress,
+          Id:InstanceId,
+          State:State.Name,
+          Type:InstanceType
+          }" \
+        --output text \
+    | awk '{printf("%-20s %-36s %-16s %-8s %-10s\n", $3, $4, $2, $5, $6)}' \
+    | gum filter)
+    echo "$r" | awk '{print $1}'
+}
+
+svc=$(echo ec2 sso s3 acm cloudfront | tr ' ' '\n' | gum filter)
+case $svc in
+  ec2 )
+    id=$(select_ec2)
+    action=$(echo ssm-start-session describe-instance | tr ' ' '\n' | gum filter)
+    case $action in
+      ssm-start-session )
+        aws ssm start-session --target "${id}"
+        ;;
+      describe-instance )
+        aws ec2 describe-instances --instance-ids "${id}"
+        ;;
+    esac
+    ;;
+  sso )
+    action=$(echo login logout | tr ' ' '\n' | gum filter)
+    aws sso "${action}"
+    ;;
+  * )
+    echo "$svc" is not implemented yet.
+esac
