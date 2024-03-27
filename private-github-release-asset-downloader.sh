@@ -22,4 +22,4 @@ asset_url=$(curl -sSL \
   https://api.github.com/repos/${repo}/releases \
   | jq -r '.[] | select(.tag_name=="'$tag'") | .assets[] | select(.name=="'${asset_name}'") | .url')
 
-curl -sSL -H "Accept: application/octet-stream" ${asset_url} -o $asset_name
+curl -sSL -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/octet-stream" ${asset_url} -o $asset_name
