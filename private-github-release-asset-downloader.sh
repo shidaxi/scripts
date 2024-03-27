@@ -8,8 +8,9 @@ help() {
   echo 'bash -c $(curl -fsSL https://shuai.dev/scripts/private-github-release-asset-downloader.sh) cli/cli v2.46.0 gh_2.46.0_linux_amd64.tar.gz'
 }
 
-if [ -z "$repo" ] -o [ -z "$tag" ] -o [ -z "${asset_name}" ]; then
+if [ -z "$repo" ] || [ -z "$tag" ] || [ -z "${asset_name}" ]; then
     help
+    exit
 fi
 
 [ -z "${GITHUB_TOKEN}" ] && { echo "GITHUB_TOKEN not set"; exit 1; }
@@ -18,7 +19,7 @@ asset_url=$(curl -sSL \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: Bearer ${GITHUB_TOKEN} "\
   -H "X-GitHub-Api-Version: 2022-11-28" \
-  https://api.github.com/repos/initia-labs/movevm/releases \
-  | jq '.[] | select(.tag_name=="'$tag'") | .assets[] | select(.name=="'${asset_name}'") | .url')
+  https://api.github.com/repos/${repo}/releases \
+  | jq -r '.[] | select(.tag_name=="'$tag'") | .assets[] | select(.name=="'${asset_name}'") | .url')
 
-curl -sSL ${asset_url} -o $asset_name
+curl -sSL -H "Accept: application/octet-stream" ${asset_url} -o $asset_name
