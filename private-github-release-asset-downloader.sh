@@ -5,7 +5,7 @@ tag="$2"
 asset_name="$3"
 
 help() {
-  echo 'bash -c $(curl -fsSL https://shuai.dev/scripts/private-github-release-asset-downloader.sh) cli/cli v2.46.0 gh_2.46.0_linux_amd64.tar.gz'
+  echo 'curl -fsSL https://shuai.dev/scripts/private-github-release-asset-downloader.sh | bash -s -- cli/cli v2.46.0 gh_2.46.0_linux_amd64.tar.gz'
 }
 
 if [ -z "$repo" ] || [ -z "$tag" ] || [ -z "${asset_name}" ]; then
