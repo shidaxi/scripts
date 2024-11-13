@@ -161,7 +161,7 @@ fi
 # ASSET_URL="${ASSET_URL//github.com/${GITHUB_TOKEN}@github.com}"
 ASSET_URL="https://${GITHUB_TOKEN}@api.github.com/repos/$ORG_REPO/releases/assets/$ASSET_ID"
 # Download the asset
-log_info "Downloading from $ASSET_URL ..."
+log_info "Downloading $ASSET_NAME..."
 curl -H "Accept: application/octet-stream" --progress-bar -sL $ASSET_URL -o $ASSET_NAME
 
 # Check if the downloaded file is a tar.gz and extract if necessary
